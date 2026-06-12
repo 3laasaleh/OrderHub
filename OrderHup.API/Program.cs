@@ -20,14 +20,12 @@ builder.Services.AddDbContext<OrderProcessorContext>(options =>
 {
     options.UseSqlServer(connectionString);
 });
-
 builder.Services.AddScoped<IOrderProcessorService, OrderProcessorService>();
 
 builder.Services.AddScoped<IOrderLineRepository, OrderLineRepository>();
 builder.Services.AddScoped<ISchoolRepository, SchoolRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IStockRepository, StockRepository>();
-
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 //builder.Services.AddHttpClient<IPaymentService, PaymentService>();
