@@ -2,5 +2,6 @@
   <Project Path="OrderHub.Application/OrderHub.Application.csproj" />
   <Project Path="OrderHub.Domain/OrderHub.Domain.csproj" />
   <Project Path="OrderHub.Infrastructure/OrderHub.Infrastructure.csproj" />
+  <Project Path="OrderHub.UnitTesting/OrderHub.UnitTesting.csproj" Id="2e5257f3-1c8a-476f-94d1-551be80a74e2" />
   <Project Path="OrderHup.API/OrderHup.API.csproj" />
 </Solution>
