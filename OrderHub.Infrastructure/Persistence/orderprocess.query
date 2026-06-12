@@ -1,0 +1,121 @@
+CREATE TABLE Schools (
+    Id INT IDENTITY PRIMARY KEY,
+    Name NVARCHAR(200) NOT NULL
+);
+
+CREATE TABLE Products (
+    Id INT IDENTITY PRIMARY KEY,
+    Sku NVARCHAR(50) NOT NULL,
+    Name NVARCHAR(200) NOT NULL,
+    Category NVARCHAR(100) NOT NULL
+);
+
+CREATE TABLE Orders (
+    Id BIGINT IDENTITY PRIMARY KEY,
+    SchoolId INT NOT NULL,
+    OrderDate DATETIME2 NOT NULL,
+    Season NVARCHAR(30) NOT NULL,
+    Status NVARCHAR(30) NOT NULL,
+
+    CONSTRAINT FK_Orders_Schools 
+        FOREIGN KEY (SchoolId) REFERENCES Schools(Id)
+);
+
+CREATE TABLE OrderLines (
+    Id BIGINT IDENTITY PRIMARY KEY,
+    OrderId BIGINT NOT NULL,
+    ProductId INT NOT NULL,
+    Quantity INT NOT NULL,
+    UnitPrice DECIMAL(18, 2) NOT NULL,
+
+    CONSTRAINT FK_OrderLines_Orders 
+        FOREIGN KEY (OrderId) REFERENCES Orders(Id),
+
+    CONSTRAINT FK_OrderLines_Products 
+        FOREIGN KEY (ProductId) REFERENCES Products(Id)
+);
+
+
+
+
+///////
+
+CREATE INDEX IX_Orders_Analytics
+ON Orders (OrderDate, Status, SchoolId, Season)
+INCLUDE (Id);
+
+CREATE INDEX IX_OrderLines_Order_Product
+ON OrderLines (OrderId, ProductId)
+INCLUDE (Quantity, UnitPrice);
+
+CREATE INDEX IX_Products_Category
+ON Products (Id, Category);
+
+CREATE INDEX IX_Schools_Name
+ON Schools (Id, Name);
+
+////
+
+DECLARE @StartDate DATE = '2024-01-01';
+DECLARE @EndDate   DATE = '2026-01-01';
+
+SELECT
+    s.Id AS SchoolId,
+    s.Name AS SchoolName,
+    o.Season,
+    p.Category AS ProductCategory,
+    YEAR(o.OrderDate) AS SalesYear,
+    SUM(ol.Quantity * ol.UnitPrice) AS Revenue
+FROM Orders o
+INNER JOIN OrderLines ol 
+    ON ol.OrderId = o.Id
+INNER JOIN Products p 
+    ON p.Id = ol.ProductId
+INNER JOIN Schools s 
+    ON s.Id = o.SchoolId
+WHERE 
+    o.OrderDate >= @StartDate
+    AND o.OrderDate < @EndDate
+    AND o.Status = 'Confirmed'
+GROUP BY
+    s.Id,
+    s.Name,
+    o.Season,
+    p.Category,
+    YEAR(o.OrderDate)
+ORDER BY
+    s.Name,
+    o.Season,
+    p.Category,
+    SalesYear;
+
+/*
+Trade-off:
+I filter by date range using OrderDate directly instead of WHERE YEAR(OrderDate) = ...
+because applying YEAR() in the WHERE clause would make the predicate non-sargable
+and prevent efficient index seeks.
+
+I still group by YEAR(OrderDate) because grouping happens after filtering.
+For very high traffic reporting, I would consider a persisted computed column SalesYear
+or a reporting table/materialized aggregate.
+*/
+
+
+
+
+///
+
+The biggest risk in the analytics query is applying functions or transformations to indexed columns in the `WHERE` clause, for example `WHERE YEAR(OrderDate) = 2025`.
+
+That makes the predicate non-sargable, so SQL Server may scan far more rows instead of seeking into the `OrderDate` index. With roughly 8M order lines during peak season, this can easily turn a dashboard query into an 18-second bottleneck.
+
+Instead, we should filter using a date range:
+
+```sql
+WHERE OrderDate >= '2025-01-01'
+  AND OrderDate <  '2026-01-01'
+```
+
+Then group by year after the filtered rows are found.
+
+I would also avoid loading this analytics page through EF with multiple includes. This should be a focused read query, ideally using SQL/Dapper or a reporting view, with covering indexes on `Orders(OrderDate, Status, SchoolId, Season)` and `OrderLines(OrderId, ProductId)` including revenue fields.
