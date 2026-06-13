@@ -4,7 +4,6 @@ using OrderHub.Application.DTOs;
 using OrderHub.Application.Interfaces;
 using OrderHub.Application.Repositoreis.Interfaces;
 using OrderHub.Application.services;
-using OrderHub.DAL.Domain.Models;
 using OrderHub.Domain.Enums;
 using OrderHub.Domain.Models;
 using Xunit;
@@ -22,6 +21,7 @@ namespace OrderHub.UnitTesting
             var stockRepo = Substitute.For<IStockRepository>();
             var paymentService = Substitute.For<IPaymentService>();
             var emailService = Substitute.For<IEmailService>();
+            var orderLineRepository = Substitute.For<IOrderLineRepository>();
 
             schoolRepo.GetByIdAsync(1, Arg.Any<CancellationToken>())
                 .Returns(new School { Id = 1, TierCode = TierCodeType.Gold });
@@ -37,7 +37,7 @@ namespace OrderHub.UnitTesting
                 productRepo,
                 stockRepo,
                 paymentService,
-                emailService);
+                emailService,orderLineRepository);
 
             var lines = new List<OrderLine>
     {
@@ -45,7 +45,7 @@ namespace OrderHub.UnitTesting
         {
             Sku = "ABC-001",
             Quantity = 5,
-            Embroidery = null
+            Embroidery = "hi"
         }
     };
 

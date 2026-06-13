@@ -23,7 +23,7 @@ namespace OrderHub.Application.services
                 await smtp.SendMailAsync("orders@brindleford.co.uk", req.ParentEmail, "Order confirmed", "Your order total is £" + req.Subtotal,cancellationToken);
 
             }
-            catch (Exception e)
+            catch (Exception )
             {
                 // should add logger here
                 throw ;

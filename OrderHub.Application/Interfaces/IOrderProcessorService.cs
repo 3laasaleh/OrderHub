@@ -1,5 +1,5 @@
 ﻿using OrderHub.Application.DTOs;
-using OrderHub.DAL.Domain.Models;
+using OrderHub.Domain.Models;
 namespace OrderHub.Application.Interfaces
 {
     public interface IOrderProcessorService

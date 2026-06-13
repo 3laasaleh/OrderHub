@@ -1,6 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using OrderHub.Application.Repositoreis.Interfaces;
-using OrderHub.DAL.Domain.Models;
+using OrderHub.Domain.Models;
 using OrderHub.Infrastructure.Persistence;
 
 

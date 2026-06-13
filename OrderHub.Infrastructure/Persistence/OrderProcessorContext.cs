@@ -1,5 +1,4 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using OrderHub.DAL.Domain.Models;
 using OrderHub.Domain.Enums;
 using OrderHub.Domain.Models;
 

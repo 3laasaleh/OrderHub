@@ -16,7 +16,6 @@
 	
   <ItemGroup>
     <ProjectReference Include="..\OrderHub.Application\OrderHub.Application.csproj" />
-    <ProjectReference Include="..\OrderHub.Domain\OrderHub.Domain.csproj" />
   </ItemGroup>
 
 </Project>

@@ -11,7 +11,7 @@ namespace OrderHub.Infrastructure.Repositories
         {
             _context = context;
         }
-        public async Task<int> GetAvailableQuantityAsync(string sku, CancellationToken ct) {
+        public async Task<long> GetAvailableQuantityAsync(string sku, CancellationToken ct) {
 
             var stock = await _context.Stocks.FirstOrDefaultAsync(s=>s.Sku.ToLower()==sku.ToLower(), ct);
 

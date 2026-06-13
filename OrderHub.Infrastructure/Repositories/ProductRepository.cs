@@ -13,7 +13,7 @@ namespace OrderHub.Infrastructure.Repositories
         {
             _context = context;
         }
-        public async Task<Product> GetBySkuAsync(string sku, CancellationToken cancellationToken)
+        public async Task<Product?> GetBySkuAsync(string sku, CancellationToken cancellationToken)
         {
             var res= await _context.Products
                 .FirstOrDefaultAsync(p => p.Sku.ToLower() == sku.ToLower(),cancellationToken);

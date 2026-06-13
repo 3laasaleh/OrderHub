@@ -1,8 +1,8 @@
 ﻿using OrderHub.Application.DTOs;
 using OrderHub.Application.Interfaces;
 using OrderHub.Application.Repositoreis.Interfaces;
-using OrderHub.DAL.Domain.Models;
 using OrderHub.Domain.Enums;
+using OrderHub.Domain.Models;
 
 namespace OrderHub.Application.services
 {
@@ -13,19 +13,22 @@ namespace OrderHub.Application.services
         private readonly IStockRepository _stockRepository;
         private readonly IPaymentService _paymentService;
         private readonly IEmailService _emailService;
+        private readonly IOrderLineRepository _orderLineRepository; 
 
         public OrderProcessorService(
             ISchoolRepository schoolRepository,
             IProductRepository productRepository,
             IStockRepository stockRepository,
             IPaymentService paymentService,
-            IEmailService emailService)
+            IEmailService emailService,
+            IOrderLineRepository orderLineRepository)
         {
             _schoolRepository = schoolRepository;
             _productRepository = productRepository;
             _stockRepository = stockRepository;
             _paymentService = paymentService;
             _emailService = emailService;
+            _orderLineRepository = orderLineRepository;
         }
 
         public async Task<ProcessOrderResult> ProcessAsync(
@@ -40,9 +43,11 @@ namespace OrderHub.Application.services
                 return ProcessOrderResult.Fail("school not found");
 
             decimal subtotal = 0;
-            
+
+
+            // get all orderlines from DB for testing purposes, in real life this would be passed in as a parameter
             if (lines is null)
-                lines = new List<OrderLine>();
+                lines = await _orderLineRepository.GetOrderLinesAsync();
 
             foreach (var line in lines)
             {

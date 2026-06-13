@@ -7,7 +7,7 @@
 namespace OrderHub.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitDB : Migration
+    public partial class IniatDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -18,9 +18,9 @@ namespace OrderHub.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    Embroidery = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Sku = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Quantity = table.Column<long>(type: "bigint", nullable: false),
-                    Embroidery = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Quantity = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -33,8 +33,8 @@ namespace OrderHub.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    TierCode = table.Column<int>(type: "int", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TierCode = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -47,8 +47,8 @@ namespace OrderHub.Infrastructure.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Sku = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Quantity = table.Column<int>(type: "int", nullable: false)
+                    Quantity = table.Column<long>(type: "bigint", nullable: false),
+                    Sku = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -64,17 +64,11 @@ namespace OrderHub.Infrastructure.Migrations
                     Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Sku = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     BasePrice = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    StockId = table.Column<int>(type: "int", nullable: false),
-                    OrderLineId = table.Column<int>(type: "int", nullable: true)
+                    StockId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Products", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Products_OrderLines_OrderLineId",
-                        column: x => x.OrderLineId,
-                        principalTable: "OrderLines",
-                        principalColumn: "Id");
                     table.ForeignKey(
                         name: "FK_Products_Stocks_StockId",
                         column: x => x.StockId,
@@ -107,25 +101,20 @@ namespace OrderHub.Infrastructure.Migrations
                 columns: new[] { "Id", "Quantity", "Sku" },
                 values: new object[,]
                 {
-                    { 1, 100, "SKU001" },
-                    { 2, 200, "SKU002" },
-                    { 3, 300, "SKU003" }
+                    { 1, 100L, "SKU001" },
+                    { 2, 200L, "SKU002" },
+                    { 3, 300L, "SKU003" }
                 });
 
             migrationBuilder.InsertData(
                 table: "Products",
-                columns: new[] { "Id", "BasePrice", "Name", "OrderLineId", "Sku", "StockId" },
+                columns: new[] { "Id", "BasePrice", "Name", "Sku", "StockId" },
                 values: new object[,]
                 {
-                    { 1, 10.00m, "Product 1", null, "SKU001", 1 },
-                    { 2, 15.00m, "Product 2", null, "SKU002", 2 },
-                    { 3, 20.00m, "Product 3", null, "SKU003", 3 }
+                    { 1, 10.00m, "Product 1", "SKU001", 1 },
+                    { 2, 15.00m, "Product 2", "SKU002", 2 },
+                    { 3, 20.00m, "Product 3", "SKU003", 3 }
                 });
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Products_OrderLineId",
-                table: "Products",
-                column: "OrderLineId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Products_StockId",
@@ -137,13 +126,13 @@ namespace OrderHub.Infrastructure.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "OrderLines");
+
+            migrationBuilder.DropTable(
                 name: "Products");
 
             migrationBuilder.DropTable(
                 name: "Schools");
-
-            migrationBuilder.DropTable(
-                name: "OrderLines");
 
             migrationBuilder.DropTable(
                 name: "Stocks");
