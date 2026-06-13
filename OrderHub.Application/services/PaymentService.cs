@@ -8,16 +8,24 @@ namespace OrderHub.Application.services
     {
         public async Task<PaymentIntentResponseDTO> CreatePaymentIntentAsync(PaymentIntentRequestDTO req, CancellationToken cancellationToken)
         {
-            var http = new HttpClient();
-            var body = "amount=" + req.Subtotal + "&email=" + req.ParentEmail;
-            var payRes = await http.PostAsync("https://api.paymentprovider.com/intents", new StringContent(body));
-            if (!payRes.IsSuccessStatusCode)
-                
-                return 
-                    new PaymentIntentResponseDTO {Message = "FAIL: payment" } ;
+			try
+			{
+                var http = new HttpClient();
+                var body = "amount=" + req.Subtotal + "&email=" + req.ParentEmail;
+                var payRes = await http.PostAsync("https://api.paymentprovider.com/intents", new StringContent(body));
+                if (!payRes.IsSuccessStatusCode)
 
-            else
-                return new PaymentIntentResponseDTO { Message = "OK" };
+                    return
+                        new PaymentIntentResponseDTO { Message = "FAIL: payment" };
+
+                else
+                    return new PaymentIntentResponseDTO { Message = "OK" };
+            }
+			catch (Exception)
+			{
+
+				throw;
+			}
         }
     }
 }
